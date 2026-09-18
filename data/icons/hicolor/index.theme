@@ -1,0 +1,18 @@
+[Icon Theme]
+Name=ModernMount
+Comment=ModernMount application icons
+Directories=scalable/apps,scalable/devices
+
+[scalable/apps]
+Size=128
+MinSize=16
+MaxSize=512
+Type=Scalable
+Context=Applications
+
+[scalable/devices]
+Size=24
+MinSize=16
+MaxSize=64
+Type=Scalable
+Context=Devices

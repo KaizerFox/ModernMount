@@ -1,0 +1,10 @@
+[Desktop Entry]
+Name=ModernMount
+Comment=Give every drive a place
+Exec=modernmount
+Icon=io.github.modernmount.ModernMount
+Terminal=false
+Type=Application
+Categories=System;GTK;
+Keywords=mount;disk;LUKS;TPM;Btrfs;storage;
+StartupNotify=true

@@ -1,0 +1,26 @@
+@define-color accent_bg_color #7cc5a1;
+@define-color accent_fg_color #14291e;
+@define-color accent_color #8edab3;
+
+window { background: #191d1c; color: #e5eae6; }
+headerbar { background: #191d1c; padding: 5px 9px; }
+.brand { font-size: 15px; font-weight: 750; letter-spacing: -.4px; }
+.sidebar-panel { background: #151918; border-right: 1px solid alpha(white, .055); }
+.eyebrow { font-size: 10px; font-weight: 750; letter-spacing: 1.3px; color: #96a69d; }
+.sidebar-caption { font-size: 12px; color: #bdc9c0; }
+.drive-row { padding: 16px 12px; border-radius: 12px; margin-bottom: 5px; }
+.drive-row:selected { background: #293e33; color: #e3f2e9; }
+.drive-row image { color: #a0b9ac; }
+.drive-row:selected image { color: #a3d8ba; }
+.drive-title { font-size: 34px; font-weight: 800; letter-spacing: -1.3px; }
+.hero-icon { background: #2b4035; color: #a1d2b8; padding: 18px; border-radius: 22px; }
+.volume-card { background: linear-gradient(120deg, #273b30, #222d28); border: 1px solid #3a5143; border-radius: 18px; padding: 22px; }
+.status-pill { background: #344e3d; color: #b9e7c6; border-radius: 20px; padding: 6px 11px; font-size: 11px; font-weight: 650; }
+.metric { font-size: 23px; font-weight: 700; letter-spacing: -.6px; }
+.demo-pill { color: #d9c99b; background: #413b2b; padding: 5px 10px; border-radius: 14px; font-size: 10px; letter-spacing: 1px; font-weight: 700; }
+preferencesgroup > box > box > label.title { font-size: 17px; font-weight: 700; letter-spacing: -.3px; }
+list.boxed-list { background: #252b28; border: 1px solid alpha(white, .04); }
+list.boxed-list > row { padding-top: 3px; padding-bottom: 3px; }
+.code-preview, .code-preview text { background: #141a17; color: #b7d7bf; font-size: 12px; }
+button.suggested-action { font-weight: 750; padding: 12px 21px; }
+banner { background: #31372e; }

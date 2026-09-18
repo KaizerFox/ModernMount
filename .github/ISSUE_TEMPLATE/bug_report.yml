@@ -1,0 +1,46 @@
+name: Bug report
+description: Report reproducible behavior that is not a security vulnerability
+title: "[Bug]: "
+labels: [bug]
+body:
+  - type: markdown
+    attributes:
+      value: "Do not include passwords, recovery keys, UUIDs, serial numbers, or sensitive mount paths. Report security issues privately according to SECURITY.md."
+  - type: textarea
+    id: problem
+    attributes:
+      label: What happened?
+      description: Describe the expected and actual behavior.
+    validations:
+      required: true
+  - type: input
+    id: version
+    attributes:
+      label: ModernMount revision
+    validations:
+      required: true
+  - type: input
+    id: system
+    attributes:
+      label: Distribution and desktop
+    validations:
+      required: true
+  - type: dropdown
+    id: storage
+    attributes:
+      label: Storage type
+      options: [Demo mode, ext4, Btrfs, XFS, FAT, exFAT, NTFS, LUKS2, Other]
+    validations:
+      required: true
+  - type: textarea
+    id: steps
+    attributes:
+      label: Reproduction steps
+      description: Use disposable data and redact identifying details.
+    validations:
+      required: true
+  - type: textarea
+    id: logs
+    attributes:
+      label: Redacted logs
+      render: shell

@@ -1,0 +1,12 @@
+#!/usr/bin/env python3
+# SPDX-FileCopyrightText: 2026 ModernMount contributors
+# SPDX-License-Identifier: GPL-3.0-or-later
+# See COPYRIGHT and LICENSE for the notice and full terms.
+
+from pathlib import Path
+import sys
+
+sys.path.insert(0, str(Path(__file__).resolve().parents[1] / "share" / "modernmount"))
+from modernmount.app import main
+
+raise SystemExit(main())

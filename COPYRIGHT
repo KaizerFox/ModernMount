@@ -1,0 +1,21 @@
+ModernMount — automatic mounts, LUKS unlocking, and TPM2 enrollment
+Copyright (C) 2026 ModernMount contributors
+SPDX-License-Identifier: GPL-3.0-or-later
+
+ModernMount is free software: you can redistribute it and/or modify it under
+the terms of the GNU General Public License as published by the Free Software
+Foundation, either version 3 of the License, or (at your option) any later
+version.
+
+ModernMount is distributed in the hope that it will be useful, but WITHOUT ANY
+WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS FOR
+A PARTICULAR PURPOSE. See the GNU General Public License for more details.
+
+You should have received a copy of the GNU General Public License along with
+ModernMount in the LICENSE file. If not, see <https://www.gnu.org/licenses/>.
+
+This notice covers project code, assets, and documentation unless a file
+specifies otherwise. The Contributor Covenant adaptation in CODE_OF_CONDUCT.md
+remains under CC BY-SA 4.0 with its existing attribution. AppStream metadata
+remains under CC0-1.0 as stated in its metadata_license field; its
+project_license field describes the application, not the metadata itself.

@@ -1,0 +1,5 @@
+[D-BUS Service]
+Name=io.github.modernmount.Helper
+Exec=/usr/libexec/modernmount-helper
+User=root
+SystemdService=modernmount-helper.service

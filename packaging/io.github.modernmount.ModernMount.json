@@ -1,0 +1,23 @@
+{
+  "app-id": "io.github.modernmount.ModernMount",
+  "runtime": "org.gnome.Platform",
+  "runtime-version": "49",
+  "sdk": "org.gnome.Sdk",
+  "command": "modernmount",
+  "finish-args": [
+    "--share=ipc",
+    "--socket=wayland",
+    "--socket=fallback-x11",
+    "--device=dri",
+    "--system-talk-name=org.freedesktop.UDisks2",
+    "--system-talk-name=io.github.modernmount.Helper"
+  ],
+  "modules": [
+    {
+      "name": "modernmount",
+      "buildsystem": "simple",
+      "build-commands": ["make install PREFIX=/app"],
+      "sources": [{"type": "dir", "path": "..", "skip": ["work", ".git", ".flatpak-builder", "build-dir", "__pycache__"]}]
+    }
+  ]
+}

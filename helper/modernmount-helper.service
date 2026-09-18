@@ -1,0 +1,21 @@
+[Unit]
+Description=ModernMount TPM2 enrollment helper
+Requires=udisks2.service
+After=udisks2.service
+
+[Service]
+Type=dbus
+BusName=io.github.modernmount.Helper
+ExecStart=/usr/libexec/modernmount-helper
+User=root
+UMask=0077
+NoNewPrivileges=true
+PrivateTmp=true
+ProtectSystem=strict
+ProtectHome=true
+ProtectKernelTunables=true
+ProtectControlGroups=true
+RestrictSUIDSGID=true
+LockPersonality=true
+RestrictAddressFamilies=AF_UNIX
+# Device access is necessary for cryptsetup and TPM2. Do not enable PrivateDevices.

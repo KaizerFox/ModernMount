@@ -1,0 +1,25 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<component type="desktop-application">
+  <id>io.github.modernmount.ModernMount</id>
+  <name>ModernMount</name>
+  <summary>Give every drive a place</summary>
+  <metadata_license>CC0-1.0</metadata_license>
+  <project_license>GPL-3.0-or-later</project_license>
+  <url type="homepage">https://github.com/KaizerFox/ModernMount</url>
+  <url type="vcs-browser">https://github.com/KaizerFox/ModernMount</url>
+  <url type="bugtracker">https://github.com/KaizerFox/ModernMount/issues</url>
+  <developer id="io.github.modernmount"><name>ModernMount contributors</name></developer>
+  <description>
+    <p>Configure automatic mounts for your Linux data drives with a native, modern interface.</p>
+    <ul>
+      <li>Discover drives and review mount configuration before saving.</li>
+      <li>Configure ext4, Btrfs, XFS, FAT, exFAT and NTFS volumes.</li>
+      <li>Unlock LUKS volumes and enroll TPM2 with the optional native host helper.</li>
+      <li>Explore safely with an in-memory demo mode.</li>
+    </ul>
+  </description>
+  <launchable type="desktop-id">io.github.modernmount.ModernMount.desktop</launchable>
+  <content_rating type="oars-1.1"/>
+  <releases><release version="0.1.0" date="2026-09-18" type="development"/></releases>
+  <supports><control>pointing</control><control>keyboard</control></supports>
+</component>
