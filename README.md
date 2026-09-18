@@ -39,6 +39,11 @@ In demo mode, **Use real drives…** opens a warning about data loss, responsibi
 warranty, and liability. You must acknowledge the warning before continuing.
 Switching discards demo changes and discovers real drives without applying changes.
 Closing the warning or choosing **Stay in demo** keeps the sample drives active.
+Direct launches into real mode (`make run`, `python3 -m modernmount`, the desktop
+launcher, or Flatpak without `--demo`) show the same acknowledgment on every
+launch, before contacting UDisks or enabling drive controls. Choosing **Quit**
+or dismissing that startup warning closes the app. Acceptance is not saved
+between launches.
 
 The app is a working development version, not a released disk-management utility.
 Real startup mounting and TPM enrollment still need validation on disposable

@@ -48,10 +48,10 @@ def button(text, callback, css=None, icon=None):
 
 
 class Window(Adw.ApplicationWindow):
-    def __init__(self, application, demo=False):
+    def __init__(self, application, demo=False, *, real_mode_acknowledged=False):
         super().__init__(application=application, title="ModernMount", default_width=1120, default_height=820)
         self.set_size_request(820, 640)
-        self.backend = DemoBackend() if demo else UDisksBackend()
+        self.backend = DemoBackend() if demo else UDisksBackend() if real_mode_acknowledged else None
         self.executor = ThreadPoolExecutor(max_workers=1, thread_name_prefix="modernmount")
         self.volumes = []
         self.selected = None
@@ -98,6 +98,7 @@ class Window(Adw.ApplicationWindow):
             self.banner.connect("button-clicked", self.leave_demo)
         root.append(self.banner)
         body = Gtk.Box(hexpand=True, vexpand=True)
+        body.set_sensitive(self.backend is not None)
         root.append(body)
 
         sidebar = Gtk.Box(orientation=Gtk.Orientation.VERTICAL, spacing=18, width_request=246)
@@ -133,10 +134,20 @@ class Window(Adw.ApplicationWindow):
 
         self.content_scroll = Gtk.ScrolledWindow(hexpand=True, vexpand=True, hscrollbar_policy=Gtk.PolicyType.NEVER)
         body.append(self.content_scroll)
-        self.refresh()
+        if self.backend is None:
+            self.count_label.set_text("Awaiting acknowledgment")
+            self.content_scroll.set_child(Adw.StatusPage(title="Before using real drives",
+                description="Read and acknowledge the warning to continue.", icon_name="dialog-warning-symbolic"))
+        else:
+            self.refresh()
 
     def leave_demo(self, *_):
-        if not self.backend.demo:
+        if self.backend is not None and self.backend.demo:
+            self.confirm_real_mode()
+
+    def confirm_real_mode(self):
+        from_demo = self.backend is not None and self.backend.demo
+        if self.backend is not None and not from_demo:
             return
         if self.busy:
             self.toast.add_toast(Adw.Toast(title="Wait for the current operation to finish."))
@@ -145,15 +156,16 @@ class Window(Adw.ApplicationWindow):
             return
         dialog = Adw.AlertDialog(
             heading="Use real drives?",
-            body="You are leaving the sample drives behind. Changes you make in real mode affect this computer’s drives and startup configuration. Incorrect settings can cause data loss or prevent drives from mounting.\n\n"
+            body="Changes you make in real mode affect this computer’s drives and startup configuration. Incorrect settings can cause data loss or prevent drives from mounting.\n\n"
                  "You are responsible for every change you choose to make. Keep backups and recovery passwords, and review each change before applying it.\n\n"
                  "ModernMount is provided without warranty. To the extent permitted by applicable law, its authors and contributors are not liable for damage arising from its use. See the GNU GPL in About ModernMount for the full terms.\n\n"
-                 "Your demo changes will be discarded. Switching modes only discovers drives; it does not apply any changes.")
+                 + ("Your demo changes will be discarded. " if from_demo else "")
+                 + "Continuing only discovers drives; it does not apply any changes.")
         dialog.set_content_width(540)
         acknowledgement = Gtk.CheckButton()
         acknowledgement.set_child(label("I understand the risks and accept responsibility for my changes.", wrap=True))
         dialog.set_extra_child(acknowledgement)
-        dialog.add_response("cancel", "Stay in demo")
+        dialog.add_response("cancel", "Stay in demo" if from_demo else "Quit")
         dialog.add_response("continue", "Use real drives")
         dialog.set_default_response("cancel")
         dialog.set_close_response("cancel")
@@ -163,12 +175,17 @@ class Window(Adw.ApplicationWindow):
 
         def responded(_dialog, response):
             self.real_mode_dialog = None
-            if response != "continue" or not acknowledgement.get_active() or self.busy or not self.backend.demo:
+            if response != "continue":
+                if not from_demo:
+                    self.executor.shutdown(wait=False, cancel_futures=True)
+                    self.destroy()
+                return
+            if not acknowledgement.get_active() or self.busy:
                 return
             application = self.get_application()
             # A fresh window prevents demo selections, callbacks, and drafts from
             # ever being used with the real backend.
-            window = Window(application, demo=False)
+            window = Window(application, demo=False, real_mode_acknowledged=True)
             application.demo = False
             window.present()
             self.executor.shutdown(wait=False, cancel_futures=True)
@@ -186,7 +203,7 @@ class Window(Adw.ApplicationWindow):
         return False
 
     def task(self, function, done):
-        if self.busy:
+        if self.busy or self.backend is None:
             return
         self.busy = True
         self.spinner.start()
@@ -214,7 +231,7 @@ class Window(Adw.ApplicationWindow):
         dialog.present(self)
 
     def refresh(self, preferred_id=None):
-        if self.busy:
+        if self.busy or self.backend is None:
             return
         if self.backend.readonly:
             self.backend = UDisksBackend()
@@ -540,6 +557,8 @@ class Application(Adw.Application):
         Gtk.IconTheme.get_for_display(display).add_search_path(str(DATA / "icons"))
         window = self.get_active_window() or Window(self, self.demo)
         window.present()
+        if window.backend is None:
+            window.confirm_real_mode()
 
 
 def main():

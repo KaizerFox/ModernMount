@@ -12,6 +12,53 @@ from modernmount.backend import DemoBackend
 
 
 class DemoSwitchTest(unittest.TestCase):
+    def test_direct_launch_requires_acknowledgment_each_time(self):
+        for accept in (False, True):
+            with self.subTest(accept=accept):
+                app = Application(demo=False)
+                app.set_application_id('io.github.modernmount.TestStartupAccept' if accept else 'io.github.modernmount.TestStartupCancel')
+                app.register(None)
+                backend = DemoBackend()
+                backend.demo = False
+                with patch('modernmount.app.UDisksBackend', return_value=backend) as real_factory, \
+                     patch.object(backend, 'apply', side_effect=AssertionError('Unexpected write')) as apply:
+                    try:
+                        app.activate()
+                        window = app.get_active_window()
+                        dialog = window.real_mode_dialog
+                        self.assertIsNotNone(dialog)
+                        self.assertIsNone(window.backend)
+                        self.assertEqual(window.volumes, [])
+                        self.assertFalse(window.content_scroll.is_sensitive())
+                        self.assertEqual(dialog.get_response_label('cancel'), 'Quit')
+                        self.assertFalse(dialog.get_response_enabled('continue'))
+                        window.lookup_action('refresh').activate(None)
+                        app.activate()
+                        self.assertIs(window.real_mode_dialog, dialog)
+                        real_factory.assert_not_called()
+                        if accept:
+                            dialog.emit('response', 'continue')
+                            real_factory.assert_not_called()
+                            dialog.get_extra_child().set_active(True)
+                            dialog.emit('response', 'continue')
+                            self.wait_for(lambda: len(app.get_windows()) == 1 and app.get_windows()[0] is not window)
+                            live = app.get_windows()[0]
+                            self.wait_for(lambda: not live.busy and bool(live.volumes))
+                            self.assertIs(live.backend, backend)
+                            self.assertIsNone(live.real_mode_dialog)
+                            self.assertTrue(live.content_scroll.is_sensitive())
+                            real_factory.assert_called_once_with()
+                        else:
+                            dialog.close()
+                            self.wait_for(lambda: not app.get_windows())
+                            real_factory.assert_not_called()
+                        apply.assert_not_called()
+                    finally:
+                        for window in app.get_windows():
+                            self.wait_for(lambda: not window.busy)
+                            window.close()
+                        app.quit()
+
     def wait_for(self, condition):
         deadline = time.monotonic() + 5
         context = GLib.MainContext.default()
