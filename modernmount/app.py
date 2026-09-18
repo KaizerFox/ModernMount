@@ -58,6 +58,7 @@ class Window(Adw.ApplicationWindow):
         self.busy = False
         self.refreshing = False
         self.drafts = {}
+        self.real_mode_dialog = None
         self.connect("close-request", self.on_close)
 
         self.toast = Adw.ToastOverlay()
@@ -92,6 +93,9 @@ class Window(Adw.ApplicationWindow):
         root.append(header)
 
         self.banner = Adw.Banner(title="Demo mode · Sample drives. Changes stay in memory.", revealed=demo)
+        if demo:
+            self.banner.set_button_label("Use real drives…")
+            self.banner.connect("button-clicked", self.leave_demo)
         root.append(self.banner)
         body = Gtk.Box(hexpand=True, vexpand=True)
         root.append(body)
@@ -130,6 +134,49 @@ class Window(Adw.ApplicationWindow):
         self.content_scroll = Gtk.ScrolledWindow(hexpand=True, vexpand=True, hscrollbar_policy=Gtk.PolicyType.NEVER)
         body.append(self.content_scroll)
         self.refresh()
+
+    def leave_demo(self, *_):
+        if not self.backend.demo:
+            return
+        if self.busy:
+            self.toast.add_toast(Adw.Toast(title="Wait for the current operation to finish."))
+            return
+        if self.real_mode_dialog:
+            return
+        dialog = Adw.AlertDialog(
+            heading="Use real drives?",
+            body="You are leaving the sample drives behind. Changes you make in real mode affect this computer’s drives and startup configuration. Incorrect settings can cause data loss or prevent drives from mounting.\n\n"
+                 "You are responsible for every change you choose to make. Keep backups and recovery passwords, and review each change before applying it.\n\n"
+                 "ModernMount is provided without warranty. To the extent permitted by applicable law, its authors and contributors are not liable for damage arising from its use. See the GNU GPL in About ModernMount for the full terms.\n\n"
+                 "Your demo changes will be discarded. Switching modes only discovers drives; it does not apply any changes.")
+        dialog.set_content_width(540)
+        acknowledgement = Gtk.CheckButton()
+        acknowledgement.set_child(label("I understand the risks and accept responsibility for my changes.", wrap=True))
+        dialog.set_extra_child(acknowledgement)
+        dialog.add_response("cancel", "Stay in demo")
+        dialog.add_response("continue", "Use real drives")
+        dialog.set_default_response("cancel")
+        dialog.set_close_response("cancel")
+        dialog.set_response_enabled("continue", False)
+        dialog.set_response_appearance("continue", Adw.ResponseAppearance.DESTRUCTIVE)
+        acknowledgement.connect("toggled", lambda check: dialog.set_response_enabled("continue", check.get_active()))
+
+        def responded(_dialog, response):
+            self.real_mode_dialog = None
+            if response != "continue" or not acknowledgement.get_active() or self.busy or not self.backend.demo:
+                return
+            application = self.get_application()
+            # A fresh window prevents demo selections, callbacks, and drafts from
+            # ever being used with the real backend.
+            window = Window(application, demo=False)
+            application.demo = False
+            window.present()
+            self.executor.shutdown(wait=False, cancel_futures=True)
+            self.destroy()
+
+        dialog.connect("response", responded)
+        self.real_mode_dialog = dialog
+        dialog.present(self)
 
     def on_close(self, *_):
         if self.busy:
@@ -501,7 +548,7 @@ def main():
         print("ModernMount", VERSION)
         return 0
     if "--help" in args:
-        print("Usage: modernmount [--demo] [--version]\n\n--demo   Explore with sample drives; never accesses real disks.")
+        print("Usage: modernmount [--demo] [--version]\n\n--demo   Start with sample drives; real drives require an explicit mode switch.")
         return 0
     unknown = set(args) - {"--demo"}
     if unknown:

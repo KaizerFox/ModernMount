@@ -3,7 +3,7 @@ DESTDIR ?=
 APP_ID = io.github.modernmount.ModernMount
 APP_DIR = $(DESTDIR)$(PREFIX)/share/modernmount
 
-.PHONY: run demo test install install-helper
+.PHONY: run demo test test-ui install install-helper
 
 run:
 	python3 -m modernmount
@@ -13,6 +13,10 @@ demo:
 
 test:
 	python3 -m unittest discover -s tests -v
+
+# Requires a graphical session; uses simulated drives only.
+test-ui:
+	python3 -m tests.ui_demo_switch
 
 install:
 	install -d $(APP_DIR)/modernmount $(APP_DIR)/data $(DESTDIR)$(PREFIX)/bin

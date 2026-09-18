@@ -30,7 +30,15 @@ make run
 
 # Tests do not mutate disks or contact the system bus.
 make test
+
+# Graphical regression check for leaving demo mode; all drives are simulated.
+make test-ui
 ```
+
+In demo mode, **Use real drives…** opens a warning about data loss, responsibility,
+warranty, and liability. You must acknowledge the warning before continuing.
+Switching discards demo changes and discovers real drives without applying changes.
+Closing the warning or choosing **Stay in demo** keeps the sample drives active.
 
 The app is a working development version, not a released disk-management utility.
 Real startup mounting and TPM enrollment still need validation on disposable
@@ -62,14 +70,19 @@ unlocking and mounting the drive.
 
 ## Flatpak
 
-Install Flatpak and flatpak-builder using your distribution's package manager.
-With Flathub configured:
+Install Flatpak using your distribution's package manager. From the project
+folder, install the builder and GNOME 49 runtime in your user account:
 
 ```sh
-flatpak install --user flathub org.gnome.Platform//49 org.gnome.Sdk//49
-flatpak-builder --user --install --force-clean build-dir packaging/io.github.modernmount.ModernMount.json
+flatpak remote-add --user --if-not-exists flathub https://dl.flathub.org/repo/flathub.flatpakrepo
+flatpak install --user flathub org.flatpak.Builder org.gnome.Platform//49 org.gnome.Sdk//49
+flatpak run org.flatpak.Builder --user --install --force-clean build-dir packaging/io.github.modernmount.ModernMount.json
 flatpak run io.github.modernmount.ModernMount --demo
 ```
+
+If your distribution provides native `flatpak-builder`, you can use that instead
+of `flatpak run org.flatpak.Builder`. Omit `--demo` from the final command to
+open the installed app with actual drive discovery.
 
 The manifest grants access only to the UDisks and ModernMount helper system-bus
 names, plus display/GPU permissions. It does not request home-directory access,
@@ -77,11 +90,17 @@ host shell access, network access, or direct block-device access. These D-Bus
 permissions still allow powerful disk operations; authorization is enforced
 by the host services. The helper cannot be installed inside the Flatpak.
 
-The Flatpak build has not yet been executed in the development environment,
-which does not have `flatpak` or `flatpak-builder` installed. The app ID is a
-development placeholder and should be replaced with an owned identity before
-publishing a Flatpak release. Screenshots remain to be added for a Flathub
-submission.
+The Flatpak was built and installed successfully on CachyOS with Flatpak 1.18.2
+and GNOME 49 on 2026-09-18. All 29 unit tests passed against the packaged Python
+modules. A GUI smoke check exercised packaged assets, drive selection, the review
+dialog, an in-memory demo save, Btrfs/LUKS controls, and the protected system
+volume view. Read-only discovery through the sandbox's UDisks connection also
+succeeded. Real configuration writes, reboot mounting, and TPM enrollment have
+not been tested through the Flatpak.
+
+The app ID is a development placeholder and should be replaced with an owned
+identity before publishing a Flatpak release. Screenshots remain to be added
+for a Flathub submission.
 
 ## Native install and host helper
 
